@@ -1,10 +1,12 @@
 #include <Exception.hpp>
 #include <MPQArchive.hpp>
 #include <StormLib.h>
+#include <errno.h>
 
 #ifdef _WIN32
 #include <windows.h>
 #else
+inline DWORD GetLastError() { return static_cast<DWORD>(errno); }
 // Linux equivalents for Windows error codes used by StormLib
 #ifndef ERROR_DISK_FULL
 #define ERROR_DISK_FULL 112
