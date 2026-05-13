@@ -3,6 +3,9 @@
 #include <Exception.hpp>
 #include <CascLib.h>
 
+// On Linux, CascLib defines DWORD as unsigned int in its own headers.
+// PULONGLONG is a Windows-only typedef; we use unsigned long long* directly.
+
 
 using namespace BlizzardArchive::Archive;
 
@@ -105,7 +108,7 @@ std::uint64_t CASCArchive::getFileSize(HANDLE file_handle) const
   assert(file_handle);
   unsigned long long size;
 
-  CascGetFileSize64(file_handle, static_cast<PULONGLONG>(&size));
+  CascGetFileSize64(file_handle, reinterpret_cast<unsigned long long*>(&size));
 
   return size;
 }

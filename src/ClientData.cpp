@@ -6,7 +6,11 @@
 
 #include <StormLib.h>
 
+#include <algorithm>
 #include <cassert>
+#include <filesystem>
+#include <regex>
+#include <string>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -144,7 +148,7 @@ BlizzardArchive::ClientData::tryCreateMPQArchive(
 
   if (!fs::exists(mpq_path)) {
     // create archive here or in MPQ class ?
-    HANDLE hMpq = NULL;
+    HANDLE hMpq = nullptr;
     unsigned long dwMaxFileCount =
         0x2000; // 0x1000 seems to be the default // 0x4 is the minimum
 
@@ -187,7 +191,7 @@ bool BlizzardArchive::ClientData::isMPQNameValid(
   // if exclude_base_mpqs, return false if the MPQ is present in the base 3.3.5
   // client. (eg patch-3 would be wrong, patch-4 would be allowed)
 
-  int const clientPatchId = 3; // 3.[3].5
+  const int clientPatchId = 3; // 3.[3].5
 
   // this doesn't include locale!
   for (auto const &filename : ClientData::ArchiveNameTemplates) {
@@ -545,7 +549,7 @@ bool ClientData::exists(Listfile::FileKey const &file_key) {
   return false;
 }
 
-int const BlizzardArchive::ClientData::getLocaleId() const {
+int BlizzardArchive::ClientData::getLocaleId() const {
   switch (_locale_mode) {
   case BlizzardArchive::Locale::AUTO:
   case BlizzardArchive::Locale::enGB:
@@ -617,9 +621,9 @@ std::string ClientData::normalizeFilenameInternal(std::string filename) {
                  [](char c) { return c == '\\' ? '/' : c; });
 
   if (filename.ends_with(".mdx")) {
-    filename = std::regex_replace(filename, std::regex(".mdx"), ".m2");
+    filename = std::regex_replace(filename, std::regex("\\.mdx$"), ".m2");
   } else if (filename.ends_with(".mdl")) {
-    filename = std::regex_replace(filename, std::regex(".mdl"), ".m2");
+    filename = std::regex_replace(filename, std::regex("\\.mdl$"), ".m2");
   }
 
   return filename;

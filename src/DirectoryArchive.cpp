@@ -50,7 +50,7 @@ bool DirectoryArchive::openFile(FileKey const& file_key, Locale locale, HANDLE* 
   if (file_path.empty())
     return false;
 
-  HANDLE handle = reinterpret_cast<void*>(static_cast<std::uintptr_t>(OpenFilesManager::instance()->openFiles().size()));
+  HANDLE handle = reinterpret_cast<void*>(static_cast<std::uintptr_t>(OpenFilesManager::instance()->openFiles().size() + 1));
 
   std::ifstream stream {file_path, std::ios_base::binary | std::ios_base::in};
 
@@ -59,6 +59,8 @@ bool DirectoryArchive::openFile(FileKey const& file_key, Locale locale, HANDLE* 
 
   OpenFilesManager::instance()->openFiles().insert(std::pair<HANDLE, std::ifstream>{handle,
     std::move(stream)});
+
+  *file_handle = handle;  // write the handle back to the caller
 
   return true;
 }

@@ -71,9 +71,7 @@ bool BlizzardArchive::Archive::MPQArchive::writeFile(
   assert(file_key.hasFilepath());
   assert(buf_size);
 
-  HANDLE hFile = NULL;
-
-  // DWORD dwFileSize = (DWORD)strlen(file_data);
+  HANDLE hFile = nullptr;
   DWORD dwFlags = 0x0;
   DWORD dwCompression = 0x0;
 
@@ -91,7 +89,7 @@ bool BlizzardArchive::Archive::MPQArchive::writeFile(
   if (SFileCreateFile(_handle, file_key.filepath().c_str(), 0, buf_size, 0,
                       dwFlags, &hFile)) {
     // Write the file
-    if (hFile != 0 &&
+    if (hFile != nullptr &&
         !SFileWriteFile(hFile, file_data, buf_size, dwCompression)) {
       // exception "Failed to write data to the MPQ"
       auto nError = SErrGetLastError();
@@ -170,7 +168,7 @@ bool BlizzardArchive::Archive::MPQArchive::addFile(
 
   assert(wow_path.hasFilepath());
 
-  HANDLE hFile = NULL;
+  HANDLE hFile = nullptr;
   DWORD dwFlags = 0x0;
   DWORD dwCompression = 0x0;
 
@@ -260,7 +258,7 @@ bool BlizzardArchive::Archive::MPQArchive::compactArchive() const {
   // optional :  callback
   // SFileSetCompactCallback(_handle, CompactCallback, &Logger);
 
-  if (!SFileCompactArchive(_handle, NULL, false)) {
+  if (!SFileCompactArchive(_handle, nullptr, false)) {
     auto error = SErrGetLastError();
     throw Exceptions::Archive::ArchiveOpenError(
         "MPQArchive::compactArchive(): Error compacting archive: " + _path);
