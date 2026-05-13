@@ -147,7 +147,7 @@ std::optional<Archive::MPQArchive*> BlizzardArchive::ClientData::tryCreateMPQArc
         {
             if (!SFileCloseArchive(hMpq))
             {
-                DWORD error = GetLastError();
+                DWORD error = SFileGetLastError();
                 throw Exceptions::Archive::ArchiveCloseError("ClientData::tryCreateMPQArchive(): Error closing archive: " + mpq_path);
             }
 
@@ -162,7 +162,7 @@ std::optional<Archive::MPQArchive*> BlizzardArchive::ClientData::tryCreateMPQArc
         else
         {
             // failed to create archive
-            DWORD error = GetLastError();
+            DWORD error = SFileGetLastError();
             throw Exceptions::Archive::ArchiveOpenError("ClientData::tryCreateMPQArchive(): Error creating archive: " + mpq_path, error);
         }
     }

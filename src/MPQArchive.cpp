@@ -10,7 +10,7 @@ MPQArchive::MPQArchive(std::string const& path, Locale locale, Listfile::Listfil
 {
   if (!SFileOpenArchive(path.c_str(), 0, MPQ_OPEN_NO_LISTFILE | STREAM_FLAG_READ_ONLY, &_handle))
   {
-    DWORD nError = GetLastError();
+    DWORD nError = SFileGetLastError();
     throw Exceptions::Archive::ArchiveOpenError("Error opening archive: " + path + "\nMake sure it isn't opened by another tool.");
   }
 
@@ -28,7 +28,7 @@ MPQArchive::MPQArchive(std::string const& path, Locale locale, Listfile::Listfil
   }
   else
   {
-      // DWORD nError = GetLastError();
+      // DWORD nError = SFileGetLastError();
       return;
   }
 }
@@ -69,7 +69,7 @@ bool BlizzardArchive::Archive::MPQArchive::writeFile(Listfile::FileKey const& fi
         if (hFile != 0 && !SFileWriteFile(hFile, file_data, buf_size, dwCompression))
         {
             // exception "Failed to write data to the MPQ"
-            auto nError = GetLastError();
+            auto nError = SFileGetLastError();
             throw Exceptions::Archive::FileWriteFailedError("MPQArchive::writeFile() SFileWriteFile: Error creating file: " +
                 file_key.filepath() + "in archive" + _path);
         }
@@ -79,14 +79,14 @@ bool BlizzardArchive::Archive::MPQArchive::writeFile(Listfile::FileKey const& fi
 
         if (!SFileFinishFile(hFile))
         {
-            auto nError = GetLastError();
+            auto nError = SFileGetLastError();
             throw Exceptions::Archive::FileWriteFailedError("MPQArchive::writeFile() SFileFinishFile: Error creating file: " +
             file_key.filepath() + "in archive" + _path);
         }
     }
     else
     {
-        DWORD const error = GetLastError();
+        DWORD const error = SFileGetLastError();
 
         if (skip_error == error)
         {
@@ -169,7 +169,7 @@ bool BlizzardArchive::Archive::MPQArchive::addFile(Listfile::FileKey const& wow_
     }
     else
     {
-        DWORD const error = GetLastError();
+        DWORD const error = SFileGetLastError();
 
         if (skip_error == error)
         {
@@ -229,7 +229,7 @@ bool BlizzardArchive::Archive::MPQArchive::compactArchive() const
 
     if (!SFileCompactArchive(_handle, NULL, false))
     {
-        auto error = GetLastError();
+        auto error = SFileGetLastError();
         throw Exceptions::Archive::ArchiveOpenError("MPQArchive::compactArchive(): Error compacting archive: " + _path);
     }
 
@@ -256,7 +256,7 @@ bool BlizzardArchive::Archive::MPQArchive::openForWritting()
     {
         if (!SFileCloseArchive(_handle))
         {
-            auto error = GetLastError();
+            auto error = SFileGetLastError();
             // ERROR_SUCCESS
             throw Exceptions::Archive::ArchiveCloseError("PQArchive::openForWritting(): Error closing archive: " + _path);
         }
@@ -266,7 +266,7 @@ bool BlizzardArchive::Archive::MPQArchive::openForWritting()
 
     if (!SFileOpenArchive(_path.c_str(), 0, 0, &_handle))
     {
-        auto error = GetLastError();
+        auto error = SFileGetLastError();
         throw Exceptions::Archive::ArchiveOpenError("MPQArchive::openForWritting(): Error opening archive: " + _path);
     }
 
@@ -281,7 +281,7 @@ bool BlizzardArchive::Archive::MPQArchive::closeToReadOnly()
     {
         if (!SFileCloseArchive(_handle))
         {
-            auto error = GetLastError();
+            auto error = SFileGetLastError();
             // ERROR_SUCCESS
             throw Exceptions::Archive::ArchiveCloseError("MPQArchive::closeToReadOnly(): Error closing archive: " + _path);
         }
@@ -291,7 +291,7 @@ bool BlizzardArchive::Archive::MPQArchive::closeToReadOnly()
 
     if (!SFileOpenArchive(_path.c_str(), 0, MPQ_OPEN_NO_LISTFILE | STREAM_FLAG_READ_ONLY, &_handle))
     {
-        auto error = GetLastError();
+        auto error = SFileGetLastError();
         throw Exceptions::Archive::ArchiveOpenError("Error opening archive: " + _path);
     }
     // don't need to read listfile again, should be added when adding files in writeFile()
