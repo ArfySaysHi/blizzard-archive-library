@@ -15,6 +15,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
+inline DWORD GetLastError() { return static_cast<DWORD>(errno); }
 #ifndef ERROR_DISK_FULL
 #define ERROR_DISK_FULL 112
 #endif
