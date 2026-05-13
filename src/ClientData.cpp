@@ -27,7 +27,8 @@
 #ifndef ERROR_SUCCESS
 #define ERROR_SUCCESS 0
 #endif
-typedef unsigned long DWORD;
+// Note: DWORD is defined by StormLib's StormPort.h as 'unsigned int' on Linux.
+// Do NOT redefine it here.
 #endif
 
 using namespace BlizzardArchive;
@@ -158,7 +159,7 @@ BlizzardArchive::ClientData::tryCreateMPQArchive(
     if (SFileCreateArchive(mpq_path.c_str(), dwCreateFlags, dwMaxFileCount,
                            &hMpq)) {
       if (!SFileCloseArchive(hMpq)) {
-        DWORD error = SErrGetLastError();
+        DWORD error = GetLastError();
         throw Exceptions::Archive::ArchiveCloseError(
             "ClientData::tryCreateMPQArchive(): Error closing archive: " +
             mpq_path);
@@ -173,7 +174,7 @@ BlizzardArchive::ClientData::tryCreateMPQArchive(
       }
     } else {
       // failed to create archive
-      DWORD error = SErrGetLastError();
+      DWORD error = GetLastError();
       throw Exceptions::Archive::ArchiveOpenError(
           "ClientData::tryCreateMPQArchive(): Error creating archive: " +
               mpq_path,

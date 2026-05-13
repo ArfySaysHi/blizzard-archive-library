@@ -7,6 +7,10 @@
 #include <optional>
 #include <mutex>
 #include <string_view>
+#include <unordered_map>
+#include <filesystem>
+#include <algorithm>
+#include <regex>
 
 #include <Listfile.hpp>
 #include <functional>
@@ -141,7 +145,7 @@ namespace BlizzardArchive
     std::string_view const locale_name() const { return ClientData::Locales[static_cast<int>(_locale_mode) - 1]; }
 
     // convert locale name to true locale id for localized strings
-    int const getLocaleId() const;
+    [[nodiscard]] int getLocaleId() const;
 
     [[nodiscard]]
     std::string getDiskPath(Listfile::FileKey const& file_key);

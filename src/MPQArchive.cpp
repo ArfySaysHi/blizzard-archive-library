@@ -18,8 +18,8 @@
 #ifndef ERROR_SUCCESS
 #define ERROR_SUCCESS 0
 #endif
-// DWORD is typically unsigned long on Linux
-typedef unsigned long DWORD;
+// Note: DWORD is defined by StormLib's StormPort.h as 'unsigned int' on Linux.
+// Do NOT redefine it here.
 #endif
 
 using namespace BlizzardArchive::Archive;
@@ -30,7 +30,7 @@ MPQArchive::MPQArchive(std::string const &path, Locale locale,
   if (!SFileOpenArchive(path.c_str(), 0,
                         MPQ_OPEN_NO_LISTFILE | STREAM_FLAG_READ_ONLY,
                         &_handle)) {
-    DWORD nError = SErrGetLastError();
+    DWORD nError = GetLastError();
     throw Exceptions::Archive::ArchiveOpenError(
         "Error opening archive: " + path +
         "\nMake sure it isn't opened by another tool.");
@@ -48,7 +48,7 @@ MPQArchive::MPQArchive(std::string const &path, Locale locale,
 
     listfile->initFromFileList(readbuffer);
   } else {
-    // DWORD nError = SErrGetLastError();
+    // DWORD nError = GetLastError();
     return;
   }
 }
@@ -92,7 +92,7 @@ bool BlizzardArchive::Archive::MPQArchive::writeFile(
     if (hFile != nullptr &&
         !SFileWriteFile(hFile, file_data, buf_size, dwCompression)) {
       // exception "Failed to write data to the MPQ"
-      auto nError = SErrGetLastError();
+      auto nError = GetLastError();
       throw Exceptions::Archive::FileWriteFailedError(
           "MPQArchive::writeFile() SFileWriteFile: Error creating file: " +
           file_key.filepath() + "in archive" + _path);
@@ -102,13 +102,13 @@ bool BlizzardArchive::Archive::MPQArchive::writeFile(
     _listfile->addFile(file_key.filepath());
 
     if (!SFileFinishFile(hFile)) {
-      auto nError = SErrGetLastError();
+      auto nError = GetLastError();
       throw Exceptions::Archive::FileWriteFailedError(
           "MPQArchive::writeFile() SFileFinishFile: Error creating file: " +
           file_key.filepath() + "in archive" + _path);
     }
   } else {
-    DWORD const error = SErrGetLastError();
+    DWORD const error = GetLastError();
 
     if (skip_error == error) {
       // don't allow chain crashing on the same error
@@ -200,7 +200,7 @@ bool BlizzardArchive::Archive::MPQArchive::addFile(
     // wow_path.filepath().c_str(), MPQ_ATTRIBUTE_CRC32 | MPQ_ATTRIBUTE_MD5);
     return true;
   } else {
-    DWORD const error = SErrGetLastError();
+    DWORD const error = GetLastError();
 
     if (skip_error == error) {
       // don't allow chain crashing on the same error
@@ -259,7 +259,7 @@ bool BlizzardArchive::Archive::MPQArchive::compactArchive() const {
   // SFileSetCompactCallback(_handle, CompactCallback, &Logger);
 
   if (!SFileCompactArchive(_handle, nullptr, false)) {
-    auto error = SErrGetLastError();
+    auto error = GetLastError();
     throw Exceptions::Archive::ArchiveOpenError(
         "MPQArchive::compactArchive(): Error compacting archive: " + _path);
   }
@@ -284,7 +284,7 @@ bool BlizzardArchive::Archive::MPQArchive::openForWritting() {
 
   if (_handle) {
     if (!SFileCloseArchive(_handle)) {
-      auto error = SErrGetLastError();
+      auto error = GetLastError();
       // ERROR_SUCCESS
       throw Exceptions::Archive::ArchiveCloseError(
           "PQArchive::openForWritting(): Error closing archive: " + _path);
@@ -294,7 +294,7 @@ bool BlizzardArchive::Archive::MPQArchive::openForWritting() {
   _handle = nullptr; // todo verify if nullptr
 
   if (!SFileOpenArchive(_path.c_str(), 0, 0, &_handle)) {
-    auto error = SErrGetLastError();
+    auto error = GetLastError();
     throw Exceptions::Archive::ArchiveOpenError(
         "MPQArchive::openForWritting(): Error opening archive: " + _path);
   }
@@ -307,7 +307,7 @@ bool BlizzardArchive::Archive::MPQArchive::closeToReadOnly() {
 
   if (_handle) {
     if (!SFileCloseArchive(_handle)) {
-      auto error = SErrGetLastError();
+      auto error = GetLastError();
       // ERROR_SUCCESS
       throw Exceptions::Archive::ArchiveCloseError(
           "MPQArchive::closeToReadOnly(): Error closing archive: " + _path);
@@ -319,7 +319,7 @@ bool BlizzardArchive::Archive::MPQArchive::closeToReadOnly() {
   if (!SFileOpenArchive(_path.c_str(), 0,
                         MPQ_OPEN_NO_LISTFILE | STREAM_FLAG_READ_ONLY,
                         &_handle)) {
-    auto error = SErrGetLastError();
+    auto error = GetLastError();
     throw Exceptions::Archive::ArchiveOpenError("Error opening archive: " +
                                                 _path);
   }
